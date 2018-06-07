@@ -26,7 +26,7 @@ enum custom_keycodes {
 
 // Dual keys tap/hold timeout.
 // If key is tapped for less than this value, send key in addition to primary action after completing the action.
-#define DUAL_HOLD_TIMEOUT 80
+#define DUAL_HOLD_TIMEOUT 85
 
 // TAP shortcut
 #define TAP(key) register_code(key); unregister_code(key)
@@ -82,7 +82,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BETA] = LAYOUT_kc( \
         _____,K1,   K2,   K3,   K4,   K5,          K6,   K7,   K8,   K9,   K0,   DEL,  \
         _____,F1,   F2,   F3,   F4,   F5,          F6,   F7,   F8,   F9,   F10,  PIPE, \
-        _____,RESET,DEBUG,_____,F11,  F12,         AON,  AOFF, LCBR, RCBR, MINS, EQL,  \
+        _____,RESET,DEBUG,_____,F11,  F12,         AON,  AOFF, LCBR, RCBR, MINS, RCTRL,  \
         _____,_____,_____,_____,_____,_____,       _____,_____,_____,_____,_____,_____ \
     )
 };
