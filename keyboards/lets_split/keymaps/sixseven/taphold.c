@@ -22,6 +22,7 @@ bool taphold_process(uint16_t keycode, keyrecord_t *record) {
                 register_code(config->shortAction);
                 unregister_code(config->shortAction);
             }
+            config->keypos.row = 255;
             return false;
         }
     }
