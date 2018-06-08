@@ -11,6 +11,9 @@ typedef struct taphold_t {
     taphold_mode_t mode;
     uint16_t shortAction;
     uint16_t longAction;
+    keypos_t keypos;
+    // We store key pos to properly release the key
+    // even when a different layer is active and the key has a different action now
 } taphold_t;
 
 extern taphold_t taphold_config[];
