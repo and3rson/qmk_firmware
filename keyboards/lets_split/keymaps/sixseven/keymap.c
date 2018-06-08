@@ -7,6 +7,7 @@
 #include "pointing_device.h"
 #include "smoothled.h"
 #include "knob_v2.h"
+#include "taphold.h"
 
 extern keymap_config_t keymap_config;
 
@@ -24,12 +25,20 @@ enum custom_keycodes {
   KC_BETA
 };
 
-// Dual keys tap/hold timeout.
-// If key is tapped for less than this value, send key in addition to primary action after completing the action.
-#define DUAL_HOLD_TIMEOUT 85
+#define TAPHOLD_CONFIG_SIZE 3
+taphold_t taphold_config[TAPHOLD_CONFIG_SIZE] = {
+    {.key=KC_ALPHA, .mode=TAPHOLD_LAYER, .shortAction=KC_ESC, .longAction=_ALPHA},
+    {.key=KC_BETA, .mode=TAPHOLD_LAYER, .shortAction=KC_EQL, .longAction=_BETA},
+    {.key=KC_LCTRL, .mode=TAPHOLD_MOD, .shortAction=KC_MINS, .longAction=KC_LCTRL}
+};
+uint16_t taphold_config_size = TAPHOLD_CONFIG_SIZE;
+uint32_t taphold_timeout = 90;
 
-// TAP shortcut
-#define TAP(key) register_code(key); unregister_code(key)
+uint8_t layer_colors[][3] = {
+    [_MAIN] = {0, 0, 32},
+    [_ALPHA] = {255, 0, 16},
+    [_BETA] = {32, 0, 255},
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Main layer
@@ -46,7 +55,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_MAIN] = LAYOUT_kc( \
         TAB,  Q,    W,    E,    R,    T,           Y,    U,    I,    O,    P,    BSPC, \
         ALPHA,A,    S,    D,    F,    G,           H,    J,    K,    L,    SCLN, ENT,  \
-        LSFT, Z,    X,    C,    V,    B,           N,    M,    COMM, DOT,  SLSH, RCTRL,\
+        LSFT, Z,    X,    C,    V,    B,           N,    M,    COMM, DOT,  SLSH, LCTRL,\
         _____,_____,_____,LALT, LGUI, SPC,         SPC,  BETA, QUOT, _____,_____,_____ \
     ),
 
@@ -58,14 +67,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
        ┣━━━━━╉─────┼─────┼─────┼─────┼─────┨      ┠─────┼─────┼─────┼─────┼─────╊━━━━━┫
        ┃     ┃     │     │     │     │     ┃      ┃ END │ INS │  [  │  ]  │  (  ┃  )  ┃
        ┗━━━━━┻━━━━━┷━━━━━╈━━━━━╈━━━━━╈━━━━━┫      ┠━━━━━╈━━━━━╈━━━━━╈━━━━━┷━━━━━┻━━━━━┛
-                         ┃     ┃     ┃     ┃      ┃MOUSL┃MOUSM┃MOUSR┃
+                         ┃     ┃     ┃     ┃      ┃     ┃     ┃     ┃
                          ┗━━━━━┻━━━━━┻━━━━━┛      ┗━━━━━┻━━━━━┻━━━━━┛
        */
     [_ALPHA] = LAYOUT_kc( \
         _____,MPRV, MPLY, MNXT, _____,_____,       _____,PGUP, UP,   PGDN, TILD, DEL,  \
         _____,_____,VOLD, VOLU, _____,_____,       HOME, LEFT, DOWN, RIGHT,GRV,  BSLS, \
         _____,_____,_____,_____,_____,_____,       END,  INS,  LBRC, RBRC, SH(9),SH(0),\
-        _____,_____,_____,_____,_____,_____,       MS_BTN1,MS_BTN3,MS_BTN2,_____,_____,_____ \
+        _____,_____,_____,_____,_____,_____,       BTN1, _____,BTN2, _____,_____,_____ \
     ),
 
     /* Beta layer (β)
@@ -140,67 +149,17 @@ void matrix_slave_scan_user(void) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    static uint16_t alpha_esc_start = 0;
-    static uint16_t beta_equal_start = 0;
-    static uint16_t ctrl_dash_start = 0;
-    /*record->event.pressed ? smoothled_set(255, 0, 16) : smoothled_set(0, 0, 16);*/
     switch (keycode) {
-        case KC_ALPHA:
-            if (record->event.pressed) {
-                layer_on(_ALPHA);
-                alpha_esc_start = timer_read();
-            } else {
-                layer_off(_ALPHA);
-                if (timer_elapsed(alpha_esc_start) < DUAL_HOLD_TIMEOUT) {
-                    TAP(KC_ESC);
-                }
-            }
-            return false;
-        case KC_BETA:
-            if (record->event.pressed) {
-                layer_on(_BETA);
-                beta_equal_start = timer_read();
-            } else {
-                layer_off(_BETA);
-                if (timer_elapsed(beta_equal_start) < DUAL_HOLD_TIMEOUT) {
-                    TAP(KC_EQL);
-                }
-            }
-            return false;
-        case KC_RCTRL:
-            if (record->event.pressed) {
-                register_code(KC_RCTL);
-                ctrl_dash_start = timer_read();
-            } else {
-                unregister_code(KC_RCTL);
-                if (timer_elapsed(ctrl_dash_start) < DUAL_HOLD_TIMEOUT) {
-                    TAP(KC_MINS);
-                }
-            }
-            return false;
         case RESET:
-            /*smoothled_set(255, 255, 0);*/
             rgblight_setrgb(255, 255, 0);
             break;
     }
-    return true;
+    return taphold_process(keycode, record);
 }
 
 uint32_t layer_state_set_user(uint32_t state) {
     uint8_t layer = biton32(state);
-    switch (layer) {
-        case _MAIN:
-            smoothled_set(0, 0, 32);
-            /*rgblight_setrgb(255, 0, 255);*/
-            break;
-        case _ALPHA:
-            smoothled_set(255, 0, 16);
-            /*rgblight_setrgb(255, 0, 0);*/
-            break;
-        case _BETA:
-            smoothled_set(32, 0, 255);
-            /*rgblight_setrgb(0, 0, 255);*/
-            break;
-    }
+    uint8_t *colors = layer_colors[layer];
+    smoothled_set(colors[0], colors[1], colors[2]);
     return state;
 }
