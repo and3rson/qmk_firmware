@@ -12,17 +12,15 @@
 #define DESCRIPTION     A 3x13 ortholinear keyboard
 
 /* key matrix size */
-#define MATRIX_ROWS 3
-#define MATRIX_COLS 13
+#define MATRIX_ROWS 6
+#define MATRIX_COLS 7
 
 /* key matrix pins */
 #define MATRIX_ROW_PINS { \
-    D1, D0, D4 \
+    C6, D7, E6, B4, B5, F4 \
 }
 #define MATRIX_COL_PINS { \
-    C6, D7, E6, B4, B5, \
-    F4, F5, F6, F7, B1, \
-    B3, B2, B6 \
+    F5, F6, F7, B1, B3, B2, B6 \
 }
 #define UNUSED_PINS
 
