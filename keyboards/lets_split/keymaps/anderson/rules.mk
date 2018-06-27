@@ -18,4 +18,4 @@ AUDIO_ENABLE = yes
 #TAP_DANCE_ENABLE = yes
 #PS2_MOUSE_ENABLE = yes
 #PS2_USE_USART = yes
-SRC += dmc12.c rainbow.c knob_v2.c shotgun.c
+SRC += knob_v2.c taphold.c smoothled.c

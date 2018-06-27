@@ -8,6 +8,7 @@
 #include "smoothled.h"
 #include "knob_v2.h"
 #include "taphold.h"
+#include "audio.h"
 
 extern keymap_config_t keymap_config;
 
@@ -19,10 +20,21 @@ extern keymap_config_t keymap_config;
 #define _ALPHA 1
 #define _BETA 2
 
+float ALPHA_SND[][2] = {
+    S__NOTE(_C5), S__NOTE(_G4), S__NOTE(_C4)
+};
+float BETA_SND[][2] = {
+    S__NOTE(_C5), S__NOTE(_G5), S__NOTE(_C6)
+};
+
 enum custom_keycodes {
   KC_MAIN = SAFE_RANGE,
   KC_ALPHA,
   KC_BETA
+};
+
+float foo[][2] = {
+    S__NOTE(_C5), S__NOTE(_G4), S__NOTE(_C4)
 };
 
 #define TAPHOLD_CONFIG_SIZE 3
@@ -34,10 +46,11 @@ taphold_t taphold_config[TAPHOLD_CONFIG_SIZE] = {
 uint16_t taphold_config_size = TAPHOLD_CONFIG_SIZE;
 uint32_t taphold_timeout = 90;
 
-uint8_t layer_colors[][3] = {
-    [_MAIN] = {0, 0, 32},
-    [_ALPHA] = {255, 0, 16},
-    [_BETA] = {32, 0, 255},
+uint32_t layer_colors[3] = {
+    [_MAIN] = 0xFF0010,
+    /*[_ALPHA] = 0xFF0040,*/
+    [_ALPHA] = 0x4000FF,
+    [_BETA] = 0x40FF80,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -97,7 +110,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 void matrix_init_user(void) {
-    smoothled_set(0, 0, 32);
+    /*smoothled_set(0, 0, 32);*/
+    smoothled_set(layer_colors[_MAIN]);
     knob_init();
     /*rgblight_setrgb(255, 0, 255);*/
 }
@@ -120,8 +134,6 @@ void matrix_scan_user(void) {
                 report_mouse_t report = pointing_device_get_report();
                 report.v += 1;
                 pointing_device_set_report(report);
-                /*register_code(KC_UP);*/
-                /*unregister_code(KC_UP);*/
             }
             knob_report.dir++;
         }
@@ -137,8 +149,6 @@ void matrix_scan_user(void) {
                 report_mouse_t report = pointing_device_get_report();
                 report.v -= 1;
                 pointing_device_set_report(report);
-                /*register_code(KC_DOWN);*/
-                /*unregister_code(KC_DOWN);*/
             }
             knob_report.dir--;
         }
@@ -150,16 +160,26 @@ void matrix_slave_scan_user(void) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
+        case KC_ALPHA:
+#ifdef AUDIO_ENABLE
+            PLAY_SONG(foo);
+#endif
+            break;
         case RESET:
             rgblight_setrgb(255, 255, 0);
             break;
+        /*case KC_ALPHA:*/
+        /*    if (record->event.pressed) PLAY_SONG(ALPHA_SND);*/
+        /*    break;*/
+        /*case KC_BETA:*/
+        /*    if (record->event.pressed) PLAY_SONG(BETA_SND);*/
+        /*    break;*/
     }
     return taphold_process(keycode, record);
 }
 
 uint32_t layer_state_set_user(uint32_t state) {
     uint8_t layer = biton32(state);
-    uint8_t *colors = layer_colors[layer];
-    smoothled_set(colors[0], colors[1], colors[2]);
+    smoothled_set(layer_colors[layer]);
     return state;
 }

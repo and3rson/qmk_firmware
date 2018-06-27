@@ -27,6 +27,7 @@ enum custom_keycodes {
   KC_BETA
 };
 
+// TapHold is my own implementation of the `LT` macro. It's processed in `process_record_user()`.
 #define TAPHOLD_CONFIG_SIZE 5
 taphold_t taphold_config[TAPHOLD_CONFIG_SIZE] = {
     {.key=KC_ALPHA, .mode=TAPHOLD_LAYER, .shortAction=KC_ESC, .longAction=_ALPHA},
