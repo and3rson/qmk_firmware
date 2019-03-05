@@ -16,13 +16,9 @@
 #define MATRIX_COLS 6
 
 /* key matrix pins */
-//C6, D7, E6, B4, B5, F4
-
 #define MATRIX_ROW_PINS { \
-    D1, D7, B6, F7, F4, B1, B3, B2 \
+    D1, D7, F6, F7, F4, B1, B3, B2 \
 }
-
-//F5, F6, F7, B1, B3, B2, B6
 
 #define MATRIX_COL_PINS { \
     B5, B4, E6, C6, D4, D0 \
@@ -56,13 +52,31 @@
 /* prevent stuck modifiers */
 #define PREVENT_STUCK_MODIFIERS
 
+#define RGB_DI_PIN D3
+#ifdef RGB_DI_PIN
+#undef RGBLIGHT_ANIMATIONS
+#define RGBLED_NUM 12
+#define RGBLIGHT_HUE_STEP 8
+#define RGBLIGHT_SAT_STEP 8
+#define RGBLIGHT_VAL_STEP 8
+#endif
 
-//#ifdef RGB_DI_PIN
-//#define RGBLIGHT_ANIMATIONS
-//#define RGBLED_NUM 0
-//#define RGBLIGHT_HUE_STEP 8
-//#define RGBLIGHT_SAT_STEP 8
-//#define RGBLIGHT_VAL_STEP 8
-//#endif
+#define B6_AUDIO
+
+#ifdef AUDIO_ENABLE
+#define STARTUP_SONG_DOOM SONG(E1M1_DOOM)
+#define STARTUP_SONG SONG( \
+    E__NOTE(_E6), \
+    E__NOTE(_A6), \
+    Q__NOTE(_E7), \
+    E__NOTE(_E6), \
+    E__NOTE(_E7) \
+)
+#endif
+
+#define NUMBER_OF_ENCODERS 1
+#define ENCODERS_PAD_A { F5 }
+#define ENCODERS_PAD_B { B6 }
+#define ENCODER_RESOLUTION 4
 
 #endif

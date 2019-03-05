@@ -2,4 +2,4 @@ ifndef QUANTUM_DIR
 	include ../../../../Makefile
 endif
 
-SRC += taphold.c
+SRC += taphold.c smoothled.c
