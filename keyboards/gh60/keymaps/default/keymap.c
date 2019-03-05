@@ -31,9 +31,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,  _______,  _______,                      _______,                                _______,  _______,  KC_LEFT,  KC_DOWN,  KC_RGHT),
 };
 
-const uint16_t PROGMEM fn_actions[] = {
-    [0] = ACTION_LAYER_MOMENTARY(1),  // to Fn overlay
-    [1] = ACTION_LAYER_TOGGLE(2),     // toggle arrow overlay
 };
 
 const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
