@@ -1,6 +1,7 @@
-#include "custom48.h"
+#include "custom49.h"
 #include "taphold.h"
 #include "smoothled.h"
+#include "pro_micro.h"
 
 #define KC______ KC_TRNS
 #define KC_K1 KC_1
@@ -44,7 +45,7 @@ uint32_t taphold_timeout = 90;
 
 uint32_t layer_colors[3] = {
     [_MAIN] = 0xFF0010,
-    /*[_ALPHA] = 0xFF0040,*/
+    [_ALPHA] = 0xFF0040,
     [_ALPHA] = 0x4020FF,
     [_BETA] = 0x20FF00,
 };
@@ -105,7 +106,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
-static bool alpha_pressed = false;
+static uint32_t last_key_pressed = 0;
+
+void rxtx_tap(keyrecord_t *record) {
+    last_key_pressed = timer_read32();
+    if (record->event.key.row < 4) {
+        RXLED1;
+    } else {
+        TXLED1;
+    }
+}
+
+void rxtx_process(void) {
+    if (timer_elapsed(last_key_pressed) > 10) {
+        RXLED0;
+        TXLED0;
+    }
+}
+
+/*static bool alpha_pressed = false;*/
 static bool beta_pressed = false;
 
 void matrix_init_user(void) {
@@ -114,6 +133,7 @@ void matrix_init_user(void) {
 
 void matrix_scan_user(void) {
     smoothled_process();
+    rxtx_process();
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -123,11 +143,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (keycode == RESET) {
         rgblight_setrgb(255, 255, 0);
     }
-    if (keycode == KC_ALPHA) {
-        alpha_pressed = record->event.pressed;
-    }
+    /*if (keycode == KC_ALPHA) {*/
+    /*    alpha_pressed = record->event.pressed;*/
+    /*}*/
     if (keycode == KC_BETA) {
         beta_pressed = record->event.pressed;
+    }
+    if (record->event.pressed) {
+        rxtx_tap(record);
     }
     return taphold_process(keycode, record);
 }
@@ -139,7 +162,7 @@ uint32_t layer_state_set_user(uint32_t state) {
 }
 
 void encoder_update_user(uint8_t index, bool clockwise) {
-    if (index == 0) { /* First encoder */
+    if (index == 0) {
         if (beta_pressed) {
             if (clockwise) {
                 tap_code(KC_VOLD);
@@ -155,3 +178,4 @@ void encoder_update_user(uint8_t index, bool clockwise) {
         }
     }
 }
+
