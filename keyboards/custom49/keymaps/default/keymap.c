@@ -20,6 +20,7 @@
 #define KC_RESET RESET
 #define KC_RGB_TOG RGB_TOG
 #define KC_RGB_MOD RGB_MOD
+#define KC_MO MO
 
 #define _MAIN 0
 #define _ALPHA 1
@@ -32,7 +33,7 @@ enum custom_keycodes {
 };
 
 // TapHold is my own implementation of the `LT` macro. It's processed in `process_record_user()`.
-#define TAPHOLD_CONFIG_SIZE 5
+#define TAPHOLD_CONFIG_SIZE 3
 taphold_t taphold_config[TAPHOLD_CONFIG_SIZE] = {
     {.key=KC_ALPHA, .mode=TAPHOLD_LAYER, .shortAction=KC_ESC, .longAction=_ALPHA},
     {.key=KC_BETA, .mode=TAPHOLD_LAYER, .shortAction=KC_EQL, .longAction=_BETA},
@@ -45,7 +46,7 @@ uint32_t taphold_timeout = 90;
 
 uint32_t layer_colors[3] = {
     [_MAIN] = 0xFF0010,
-    [_ALPHA] = 0xFF0040,
+    /*[_ALPHA] = 0xFF0040,*/
     [_ALPHA] = 0x4020FF,
     [_BETA] = 0x20FF00,
 };
@@ -57,56 +58,60 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
        ┣━━━━━╉─────┼─────┼─────┼─────┼─────┨─────┼─────┼─────┼─────┼─────╊━━━━━┫
        ┃𝛼/ESC┃  A  │  S  │  D  │  F  │  G  ┃  H  │  J  │  K  │  L  │  ;  ┃ RET ┃
        ┣━━━━━╉─────┼─────┼─────┼─────┼─────┨─────┼─────┼─────┼─────┼─────╊━━━━━┫
-       ┃SHIFT┃  Z  │  X  │  C  │  V  │  B  ┃  N  │  M  │  ,  │  .  │  /  ┃CTL/-┃
+       ┃SHIFT┃  Z  │  X  │  C  │  V  │  B  ┃  N  │  M  │  ,  │  .  │  /  ┃LCTRL┃
        ┣━━━━━╉─────┼─────┼─────┼─────┼─────┨─────┼─────┼─────┼─────┼─────╊━━━━━┫
-       ┃CTRL ┃     │     │ ALT │ GUI │SPACE┃SPACE│ 𝛽/= │  '  │     │     ┃  -  ┃
+       ┃CTRL ┃     │     │ ALT │ GUI │SPACE┃SPACE│  𝛽  │  '  │     │     ┃     ┃
        ┗━━━━━┻━━━━━┷━━━━━┷━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┷━━━━━┷━━━━━┻━━━━━┛
        */
     [_MAIN] = LAYOUT_kc( \
         TAB,  Q,    W,    E,    R,    T,           Y,    U,    I,    O,    P,    BSPC, \
         ALPHA,A,    S,    D,    F,    G,           H,    J,    K,    L,    SCLN, ENT,  \
-        LSFT, Z,    X,    C,    V,    B,           N,    M,    COMM, DOT,  SLSH, LCTRL, \
-        LCTRL,_____,_____,LALT, LGUI, SPC,         SPC,  BETA, QUOT, _____,_____,MINS \
+        LSFT, Z,    X,    C,    V,    B,           N,    M,    COMM, DOT,  SLSH, LCTRL,\
+        LCTRL,_____,_____,LALT, LGUI, SPC,         SPC,  BETA, QUOT, _____,_____,_____ \
     ),
 
     /* Alpha layer (𝛼)
        ┏━━━━━┳━━━━━┯━━━━━┯━━━━━┯━━━━━┯━━━━━┳━━━━━┯━━━━━┯━━━━━┯━━━━━┯━━━━━┳━━━━━┓
-       ┃     ┃PREV │PLAY │NEXT │     │     ┃     │ ^^^ │  ^  │ vvv │  ~  ┃ DEL ┃
+       ┃     ┃PREV │PLAY │NEXT │     │     ┃  -  │ ^^^ │  ^  │ vvv │  ~  ┃ DEL ┃
        ┣━━━━━╉─────┼─────┼─────┼─────┼─────┨─────┼─────┼─────┼─────┼─────╊━━━━━┫
        ┃     ┃     │VOL -│VOL +│     │     ┃HOME │ <-- │  v  │ --> │  `  ┃  \  ┃
        ┣━━━━━╉─────┼─────┼─────┼─────┼─────┨─────┼─────┼─────┼─────┼─────╊━━━━━┫
-       ┃     ┃     │     │     │     │     ┃ END │ INS │  [  │  ]  │  (  ┃  )  ┃
+       ┃     ┃     │     │     │     │     ┃ END │  =  │  [  │  ]  │  (  ┃  )  ┃
        ┣━━━━━╉─────┼─────┼─────┼─────┼─────┨─────┼─────┼─────┼─────┼─────╊━━━━━┫
-       ┃     ┃     │     │     │     │     ┃     │     │  {  │  }  │     ┃     ┃
+       ┃     ┃     │     │     │     │     ┃     │     │     │     │     ┃     ┃
        ┗━━━━━┻━━━━━┷━━━━━┷━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┷━━━━━┷━━━━━┻━━━━━┛
        */
     [_ALPHA] = LAYOUT_kc( \
-        _____,MPRV, MPLY, MNXT, _____,_____,_____,PGUP, UP,   PGDN, TILD, DEL,  \
+        _____,MPRV, MPLY, MNXT, _____,_____,MINS, PGUP, UP,   PGDN, TILD, DEL,  \
         _____,_____,VOLD, VOLU, _____,_____,HOME, LEFT, DOWN, RIGHT,GRV,  BSLS, \
-        _____,_____,_____,_____,_____,_____,END,  INS,  LBRC, RBRC, SH(9),SH(0),\
-        _____,_____,_____,_____,_____,_____,_____,_____,LCBR, RCBR, _____,_____ \
+        _____,_____,_____,_____,_____,_____,END,  EQL,  LBRC, RBRC, SH(9),SH(0),\
+        _____,_____,_____,_____,_____,_____,_____,_____,_____,_____,_____,_____ \
     ),
 
     /* Beta layer (𝛽)
        ┏━━━━━┳━━━━━┯━━━━━┯━━━━━┯━━━━━┯━━━━━┳━━━━━┯━━━━━┯━━━━━┯━━━━━┯━━━━━┳━━━━━┓
-       ┃ RGB ┃  1  │  2  │  3  │  4  │  5  ┃  6  │  7  │  8  │  9  │  0  ┃     ┃
+       ┃ RGB ┃  1  │  2  │  3  │  4  │  5  ┃  6  │  7  │  8  │  9  │  0  ┃ F12 ┃
        ┣━━━━━╉─────┼─────┼─────┼─────┼─────┨─────┼─────┼─────┼─────┼─────╊━━━━━┫
-       ┃RGB_M┃ F1  │ F2  │ F3  │ F4  │ F5  ┃ F6  │ F7  │ F8  │ F9  │ F10 ┃     ┃
+       ┃RGB_M┃ F1  │ F2  │ F3  │ F4  │ F5  ┃ F6  │ F7  │ F8  │ F9  │ F10 ┃ F11 ┃
        ┣━━━━━╉─────┼─────┼─────┼─────┼─────┨─────┼─────┼─────┼─────┼─────╊━━━━━┫
-       ┃     ┃RESET│DEBUG│     │     │     ┃     │     │     │ F11 │ F12 ┃     ┃
+       ┃     ┃RESET│DEBUG│     │     │     ┃     │     │  {  │  }  │     ┃     ┃
        ┣━━━━━╉─────┼─────┼─────┼─────┼─────┨─────┼─────┼─────┼─────┼─────╊━━━━━┫
        ┃     ┃     │     │     │     │     ┃     │     │     │     │     ┃     ┃
        ┗━━━━━┻━━━━━┷━━━━━┷━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┷━━━━━┷━━━━━┻━━━━━┛
        */
     [_BETA] = LAYOUT_kc( \
-        RGB_TOG,K1, K2,   K3,   K4,   K5,   K6,   K7,   K8,   K9,   K0,   _____, \
-        RGB_MOD,F1, F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,   F10,  _____, \
-        _____,RESET,DEBUG,_____,_____,_____,_____,_____,_____,F11,  F12,  _____, \
+        RGB_TOG,K1, K2,   K3,   K4,   K5,   K6,   K7,   K8,   K9,   K0,   F12,  \
+        RGB_MOD,F1, F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,   F10,  F11,  \
+        _____,RESET,DEBUG,_____,_____,_____,_____,_____,LCBR, RCBR, _____,_____,\
         _____,_____,_____,_____,_____,_____,_____,_____,_____,_____,_____,_____ \
     )
 };
 
 static uint32_t last_key_pressed = 0;
+
+void rxtx_init(void) {
+    TX_RX_LED_INIT;
+}
 
 void rxtx_tap(keyrecord_t *record) {
     last_key_pressed = timer_read32();
@@ -118,7 +123,7 @@ void rxtx_tap(keyrecord_t *record) {
 }
 
 void rxtx_process(void) {
-    if (timer_elapsed(last_key_pressed) > 10) {
+    if (timer_elapsed(last_key_pressed) > 0) {
         RXLED0;
         TXLED0;
     }
@@ -129,6 +134,7 @@ static bool beta_pressed = false;
 
 void matrix_init_user(void) {
     smoothled_set(layer_colors[_MAIN]);
+    rxtx_init();
 }
 
 void matrix_scan_user(void) {
