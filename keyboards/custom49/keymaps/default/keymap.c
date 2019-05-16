@@ -131,6 +131,13 @@ void rxtx_process(void) {
 
 /*static bool alpha_pressed = false;*/
 static bool beta_pressed = false;
+static uint8_t keys_pressed = 0;
+static uint16_t last_keycode = 0;
+
+static uint32_t last_scan = 0;
+static uint16_t sps = 0;
+static uint16_t avg_delta = 0;
+static uint32_t last_sps_update = 0;
 
 void matrix_init_user(void) {
     smoothled_set(layer_colors[_MAIN]);
@@ -140,12 +147,28 @@ void matrix_init_user(void) {
 void matrix_scan_user(void) {
     smoothled_process();
     rxtx_process();
+    uint32_t now = timer_read32();
+    uint32_t delta = now - last_scan;
+    if (now - last_sps_update > 250) {
+        avg_delta = delta;
+        sps = 1000 / delta;
+        last_sps_update = now;
+    }
+    last_scan = timer_read32();
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     /*if (keycode == KC_BETA && record->event.pressed) {*/
     /*    print("Foo\n");*/
     /*}*/
+    if (record->event.pressed) {
+        keys_pressed++;
+        last_keycode = keycode;
+    } else {
+        keys_pressed--;
+        last_keycode = 0;
+    }
+
     if (keycode == RESET) {
         rgblight_setrgb(255, 255, 0);
     }
@@ -184,4 +207,55 @@ void encoder_update_user(uint8_t index, bool clockwise) {
         }
     }
 }
+
+/*#ifdef OLED_DRIVER_ENABLE*/
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    return OLED_ROTATION_270;
+  /*if (!is_keyboard_master())*/
+  /*  return OLED_ROTATION_180;  // flips the display 180 degrees if offhand*/
+  /*return rotation;*/
+}
+
+/*static uint32_t last_render = 0;*/
+
+void oled_task_user(void) {
+    // Host Keyboard Layer Status
+    oled_write_P(PSTR("\n\n-C49-\n\n"), false);
+    uint8_t current_layer = biton32(layer_state);
+    oled_write_P(PSTR("     "), current_layer == _MAIN);
+    oled_write_P(current_layer == _MAIN ? PSTR("< 0 >") : PSTR("  0  "), current_layer == _MAIN);
+    oled_write_P(PSTR("     "), current_layer == _MAIN || current_layer == _ALPHA);
+    oled_write_P(current_layer == _ALPHA ? PSTR("< A >") : PSTR("  A  "), current_layer == _ALPHA);
+    oled_write_P(PSTR("     "), current_layer == _ALPHA || current_layer == _BETA);
+    oled_write_P(current_layer == _BETA ? PSTR("< B >") : PSTR("  B  "), current_layer == _BETA);
+    oled_write_P(PSTR("     "), current_layer == _BETA);
+    /*char data[4] = {' ', ' ', '0' + keys_pressed, 0};*/
+    /*oled_write(data, false);*/
+
+    if (last_keycode && 0) {
+        char data[6] = {0};
+        if (last_keycode == KC_ALPHA) {
+            memcpy(data, "<A>", 3);
+        } else if (last_keycode == KC_BETA) {
+            memcpy(data, "<B>", 3);
+        } else {
+            sprintf(data, "%d", last_keycode);
+        }
+        oled_write_ln(data, false);
+    } else {
+        oled_write_ln("", false);
+    }
+
+    char data[6] = {0};
+    sprintf(data, " %d", sps);
+    /*sprintf(data, "%d", avg_delta);*/
+    oled_write(data, false);
+
+    // Host Keyboard LED Status
+    uint8_t led_usb_state = host_keyboard_leds();
+    oled_write_P(led_usb_state & (1<<USB_LED_NUM_LOCK) ? PSTR("NUMLCK ") : PSTR("       "), false);
+    oled_write_P(led_usb_state & (1<<USB_LED_CAPS_LOCK) ? PSTR("CAPLCK ") : PSTR("       "), false);
+    oled_write_P(led_usb_state & (1<<USB_LED_SCROLL_LOCK) ? PSTR("SCRLCK ") : PSTR("       "), false);
+}
+/*#endif*/
 
