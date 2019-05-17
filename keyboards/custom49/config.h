@@ -81,4 +81,6 @@
 #define ENCODERS_PAD_B { D0 }
 #define ENCODER_RESOLUTION 4
 
+#define OLED_FONT_H "glcdfont_49.c"
+
 #endif

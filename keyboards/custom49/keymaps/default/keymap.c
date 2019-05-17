@@ -220,17 +220,54 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 
 void oled_task_user(void) {
     // Host Keyboard Layer Status
-    oled_write_P(PSTR("\n\n-C49-\n\n"), false);
+    oled_write_P(PSTR("\n\n-C49-\n"), false);
     uint8_t current_layer = biton32(layer_state);
-    oled_write_P(PSTR("     "), current_layer == _MAIN);
-    oled_write_P(current_layer == _MAIN ? PSTR("< 0 >") : PSTR("  0  "), current_layer == _MAIN);
-    oled_write_P(PSTR("     "), current_layer == _MAIN || current_layer == _ALPHA);
-    oled_write_P(current_layer == _ALPHA ? PSTR("< A >") : PSTR("  A  "), current_layer == _ALPHA);
-    oled_write_P(PSTR("     "), current_layer == _ALPHA || current_layer == _BETA);
-    oled_write_P(current_layer == _BETA ? PSTR("< B >") : PSTR("  B  "), current_layer == _BETA);
-    oled_write_P(PSTR("     "), current_layer == _BETA);
-    /*char data[4] = {' ', ' ', '0' + keys_pressed, 0};*/
-    /*oled_write(data, false);*/
+    /*oled_write_P(PSTR("     "), current_layer == _MAIN);*/
+    /*oled_write_P(current_layer == _MAIN ? PSTR("< 0 >") : PSTR("  0  "), current_layer == _MAIN);*/
+    /*oled_write_P(PSTR("     "), current_layer == _MAIN || current_layer == _ALPHA);*/
+    /*oled_write_P(current_layer == _ALPHA ? PSTR("< A >") : PSTR("  A  "), current_layer == _ALPHA);*/
+    /*oled_write_P(PSTR("     "), current_layer == _ALPHA || current_layer == _BETA);*/
+    /*oled_write_P(current_layer == _BETA ? PSTR("< B >") : PSTR("  B  "), current_layer == _BETA);*/
+    /*oled_write_P(PSTR("     "), current_layer == _BETA);*/
+
+    static const char PROGMEM layers[4][26] = {
+        {
+            ' ', ' ', ' ', ' ', ' ',
+            0x80, 0x81, 0x82, 0x83, 0x84,
+            0xa0, 0xa1, 0xa2, 0xa3, 0xa4,
+            0xc0, 0xc1, 0xc2, 0xc3, 0xc4,
+            ' ', ' ', ' ', ' ', ' ', 0
+        },
+        {
+            ' ', ' ', ' ', ' ', ' ',
+            0x85, 0x86, 0x87, 0x88, 0x89,
+            0xa5, 0xa6, 0xa7, 0xa8, 0xa9,
+            0xc5, 0xc6, 0xc7, 0xc8, 0xc9,
+            ' ', ' ', ' ', ' ', ' ', 0
+        },
+        {
+            ' ', ' ', ' ', ' ', ' ',
+            0x8a, 0x8b, 0x8c, 0x8d, 0x8e,
+            0xaa, 0xab, 0xac, 0xad, 0xae,
+            0xca, 0xcb, 0xcc, 0xcd, 0xce,
+            ' ', ' ', ' ', ' ', ' ', 0
+        },
+        {
+            ' ', ' ', ' ', ' ', ' ',
+            0x8f, 0x90, 0x91, 0x92, 0x93,
+            0xaf, 0xb0, 0xb1, 0xb2, 0xb3,
+            0xcf, 0xd0, 0xd1, 0xd2, 0xd3,
+            ' ', ' ', ' ', ' ', ' ', 0
+        }
+    };
+
+    uint8_t icon_index = current_layer == _MAIN ? 3 : current_layer == _ALPHA ? 1 : 2;
+    oled_write_P(layers[icon_index], current_layer != _MAIN);
+
+    oled_write_P(PSTR("\n"), false);
+
+    char key_data[4] = {' ', ' ', '0' + keys_pressed, 0};
+    oled_write(key_data, false);
 
     if (last_keycode && 0) {
         char data[6] = {0};
@@ -246,16 +283,16 @@ void oled_task_user(void) {
         oled_write_ln("", false);
     }
 
-    char data[6] = {0};
-    sprintf(data, " %d", sps);
+    char sps_data[6] = {0};
+    sprintf(sps_data, " %d", sps);
     /*sprintf(data, "%d", avg_delta);*/
-    oled_write(data, false);
+    oled_write(sps_data, false);
 
     // Host Keyboard LED Status
-    uint8_t led_usb_state = host_keyboard_leds();
-    oled_write_P(led_usb_state & (1<<USB_LED_NUM_LOCK) ? PSTR("NUMLCK ") : PSTR("       "), false);
-    oled_write_P(led_usb_state & (1<<USB_LED_CAPS_LOCK) ? PSTR("CAPLCK ") : PSTR("       "), false);
-    oled_write_P(led_usb_state & (1<<USB_LED_SCROLL_LOCK) ? PSTR("SCRLCK ") : PSTR("       "), false);
+    /*uint8_t led_usb_state = host_keyboard_leds();*/
+    /*oled_write_P(led_usb_state & (1<<USB_LED_NUM_LOCK) ? PSTR("NUMLCK ") : PSTR("       "), false);*/
+    /*oled_write_P(led_usb_state & (1<<USB_LED_CAPS_LOCK) ? PSTR("CAPLCK ") : PSTR("       "), false);*/
+    /*oled_write_P(led_usb_state & (1<<USB_LED_SCROLL_LOCK) ? PSTR("SCRLCK ") : PSTR("       "), false);*/
 }
 /*#endif*/
 
