@@ -139,6 +139,11 @@ static uint16_t sps = 0;
 static uint16_t avg_delta = 0;
 static uint32_t last_sps_update = 0;
 
+static bool ctrl_pressed = false;
+static bool alt_pressed = false;
+static bool shift_pressed = false;
+static bool gui_pressed = false;
+
 void matrix_init_user(void) {
     smoothled_set(layer_colors[_MAIN]);
     rxtx_init();
@@ -167,6 +172,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     } else {
         keys_pressed--;
         last_keycode = 0;
+    }
+
+    if (keycode == KC_LCTRL) {
+        ctrl_pressed = record->event.pressed;
+    } else if (keycode == KC_LALT) {
+        alt_pressed = record->event.pressed;
+    } else if (keycode == KC_LSFT) {
+        shift_pressed = record->event.pressed;
+    } else if (keycode == KC_LGUI) {
+        gui_pressed = record->event.pressed;
     }
 
     if (keycode == RESET) {
@@ -266,27 +281,35 @@ void oled_task_user(void) {
 
     oled_write_P(PSTR("\n"), false);
 
-    char key_data[4] = {' ', ' ', '0' + keys_pressed, 0};
-    oled_write(key_data, false);
-
-    if (last_keycode && 0) {
-        char data[6] = {0};
-        if (last_keycode == KC_ALPHA) {
-            memcpy(data, "<A>", 3);
-        } else if (last_keycode == KC_BETA) {
-            memcpy(data, "<B>", 3);
-        } else {
-            sprintf(data, "%d", last_keycode);
-        }
-        oled_write_ln(data, false);
-    } else {
-        oled_write_ln("", false);
-    }
+    /*char key_data[4] = {' ', ' ', '0' + keys_pressed, 0};*/
+    /*oled_write(key_data, false);*/
 
     char sps_data[6] = {0};
     sprintf(sps_data, " %d", sps);
     /*sprintf(data, "%d", avg_delta);*/
     oled_write(sps_data, false);
+    oled_write_P(PSTR("\n\n"), false);
+
+    char mod_data[6] = "\x07\x07\x07\x07\x07\0";
+    if (ctrl_pressed) mod_data[0] = 'C';
+    if (alt_pressed) mod_data[1] = 'A';
+    if (shift_pressed) mod_data[3] = 'S';
+    if (gui_pressed) mod_data[4] = 'G';
+    oled_write(mod_data, false);
+
+    /*if (last_keycode) {*/
+    /*    char data[6] = {0};*/
+    /*    if (last_keycode == KC_ALPHA) {*/
+    /*        memcpy(data, "<A>", 3);*/
+    /*    } else if (last_keycode == KC_BETA) {*/
+    /*        memcpy(data, "<B>", 3);*/
+    /*    } else {*/
+    /*        sprintf(data, "%d", last_keycode);*/
+    /*    }*/
+    /*    oled_write_ln(data, false);*/
+    /*} else {*/
+    /*    oled_write_ln("", false);*/
+    /*}*/
 
     // Host Keyboard LED Status
     /*uint8_t led_usb_state = host_keyboard_leds();*/
