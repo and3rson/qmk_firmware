@@ -1,4 +1,4 @@
-#include "custom49.h"
+#include "endgame48.h"
 #include "taphold.h"
 #include "smoothled.h"
 #include "pro_micro.h"
@@ -45,11 +45,12 @@ uint16_t taphold_config_size = TAPHOLD_CONFIG_SIZE;
 uint32_t taphold_timeout = 90;
 
 uint32_t layer_colors[3] = {
-    [_MAIN] = 0xFF0010,
+    [_MAIN] = 0x4020FF,
     /*[_ALPHA] = 0xFF0040,*/
-    [_ALPHA] = 0x4020FF,
+    [_ALPHA] = 0xFF0010,
     [_BETA] = 0x20FF00,
 };
+#define DEBUG_COLOR 0xFFFFFF
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Main layer
@@ -129,67 +130,67 @@ void rxtx_process(void) {
     }
 }
 
-/*static bool alpha_pressed = false;*/
+static bool alpha_pressed = false;
 static bool beta_pressed = false;
 static uint8_t keys_pressed = 0;
-static uint16_t last_keycode = 0;
+/*static uint16_t last_keycode = 0;*/
 
-static uint32_t last_scan = 0;
-static uint16_t sps = 0;
-static uint16_t avg_delta = 0;
-static uint32_t last_sps_update = 0;
+/*static uint32_t last_scan = 0;*/
+/*static uint16_t sps = 0;*/
+/*static uint16_t avg_delta = 0;*/
+/*static uint32_t last_sps_update = 0;*/
 
-static bool ctrl_pressed = false;
-static bool alt_pressed = false;
-static bool shift_pressed = false;
-static bool gui_pressed = false;
+/*static bool ctrl_pressed = false;*/
+/*static bool alt_pressed = false;*/
+/*static bool shift_pressed = false;*/
+/*static bool gui_pressed = false;*/
 
-static char history[6] = {0};
+/*static char history[6] = {0};*/
 
-static char charmap[] = {
-    0, 0, 0, 0,
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
-    'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-    0,
-    0, 0, 0, ' ', 0, 0, 0, 0, '\\', 0,
-    ':', 0, '`', ',', '.', '/'
-};
-const uint8_t charmap_size = sizeof(charmap) / sizeof(charmap[0]);
+/*static char charmap[] = {*/
+/*    0, 0, 0, 0,*/
+/*    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',*/
+/*    'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',*/
+/*    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',*/
+/*    0,*/
+/*    0, 0, 0, ' ', 0, 0, 0, 0, '\\', 0,*/
+/*    ':', 0, '`', ',', '.', '/'*/
+/*};*/
+/*const uint8_t charmap_size = sizeof(charmap) / sizeof(charmap[0]);*/
 
-void add_to_history(uint16_t code) {
-    // a-z0-9: 4-39
-    // -: 224````````
-    // `: 53
-    // ~: 565
-    //  : 44
-    // :: 51
-    // ,./: 54-56
-    // BS: 42
-    // RET: 48
-    // \: 49
+/*void add_to_history(uint16_t code) {*/
+/*    // a-z0-9: 4-39*/
+/*    // -: 224````````*/
+/*    // `: 53*/
+/*    // ~: 565*/
+/*    //  : 44*/
+/*    // :: 51*/
+/*    // ,./: 54-56*/
+/*    // BS: 42*/
+/*    // RET: 48*/
+/*    // \: 49*/
 
-    int i = 0;
-    for (; i < 5 && history[i]; i++);
+/*    int i = 0;*/
+/*    for (; i < 5 && history[i]; i++);*/
 
-    if (code == 42) {
-        if (i) {
-            history[i - 1] = 0;
-        }
-    } else if (code == 40) {
-        while(i > 0) {
-            history[--i] = 0;
-        }
-    } else if (code < charmap_size && charmap[code]) {
-        if (i == 5) {
-            for (int k = 0; k < i; k++) {
-                history[k] = history[k + 1];
-            }
-            i--;
-        }
-        history[i] = charmap[code];
-    }
-}
+/*    if (code == 42) {*/
+/*        if (i) {*/
+/*            history[i - 1] = 0;*/
+/*        }*/
+/*    } else if (code == 40) {*/
+/*        while(i > 0) {*/
+/*            history[--i] = 0;*/
+/*        }*/
+/*    } else if (code < charmap_size && charmap[code]) {*/
+/*        if (i == 5) {*/
+/*            for (int k = 0; k < i; k++) {*/
+/*                history[k] = history[k + 1];*/
+/*            }*/
+/*            i--;*/
+/*        }*/
+/*        history[i] = charmap[code];*/
+/*    }*/
+/*}*/
 
 void matrix_init_user(void) {
     smoothled_set(layer_colors[_MAIN]);
@@ -199,14 +200,14 @@ void matrix_init_user(void) {
 void matrix_scan_user(void) {
     smoothled_process();
     rxtx_process();
-    uint32_t now = timer_read32();
-    uint32_t delta = now - last_scan;
-    if (now - last_sps_update > 250) {
-        avg_delta = delta;
-        sps = 1000 / delta;
-        last_sps_update = now;
-    }
-    last_scan = timer_read32();
+    /*uint32_t now = timer_read32();*/
+    /*uint32_t delta = now - last_scan;*/
+    /*if (now - last_sps_update > 250) {*/
+    /*    avg_delta = delta;*/
+    /*    sps = 1000 / delta;*/
+    /*    last_sps_update = now;*/
+    /*}*/
+    /*last_scan = timer_read32();*/
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -215,29 +216,29 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     /*}*/
     if (record->event.pressed) {
         keys_pressed++;
-        last_keycode = keycode;
-        add_to_history(keycode);
+        /*last_keycode = keycode;*/
+        /*add_to_history(keycode);*/
     } else {
         keys_pressed--;
-        last_keycode = 0;
+        /*last_keycode = 0;*/
     }
 
     if (keycode == KC_LCTRL) {
-        ctrl_pressed = record->event.pressed;
+        /*ctrl_pressed = record->event.pressed;*/
     } else if (keycode == KC_LALT) {
-        alt_pressed = record->event.pressed;
+        /*alt_pressed = record->event.pressed;*/
     } else if (keycode == KC_LSFT) {
-        shift_pressed = record->event.pressed;
+        /*shift_pressed = record->event.pressed;*/
     } else if (keycode == KC_LGUI) {
-        gui_pressed = record->event.pressed;
+        /*gui_pressed = record->event.pressed;*/
     }
 
     if (keycode == RESET) {
-        rgblight_setrgb(255, 255, 0);
+        rgblight_setrgb((DEBUG_COLOR >> 16) & 0xFF, (DEBUG_COLOR >> 8) & 0xFF, DEBUG_COLOR & 0xFF);
     }
-    /*if (keycode == KC_ALPHA) {*/
-    /*    alpha_pressed = record->event.pressed;*/
-    /*}*/
+    if (keycode == KC_ALPHA) {
+        alpha_pressed = record->event.pressed;
+    }
     if (keycode == KC_BETA) {
         beta_pressed = record->event.pressed;
     }
@@ -261,6 +262,12 @@ void encoder_update_user(uint8_t index, bool clockwise) {
             } else {
                 tap_code(KC_VOLU);
             }
+        } else if (alpha_pressed) {
+            if (clockwise) {
+                tap_code(KC_LEFT);
+            } else {
+                tap_code(KC_RIGHT);
+            }
         } else {
             if (clockwise) {
                 tap_code(KC_UP);
@@ -272,19 +279,19 @@ void encoder_update_user(uint8_t index, bool clockwise) {
 }
 
 /*#ifdef OLED_DRIVER_ENABLE*/
-oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-    return OLED_ROTATION_270;
-  /*if (!is_keyboard_master())*/
-  /*  return OLED_ROTATION_180;  // flips the display 180 degrees if offhand*/
-  /*return rotation;*/
-}
+/*oled_rotation_t oled_init_user(oled_rotation_t rotation) {*/
+/*    return OLED_ROTATION_270;*/
+/*  [>if (!is_keyboard_master())<]*/
+/*  [>  return OLED_ROTATION_180;  // flips the display 180 degrees if offhand<]*/
+/*  [>return rotation;<]*/
+/*}*/
 
 /*static uint32_t last_render = 0;*/
 
 void oled_task_user(void) {
     // Host Keyboard Layer Status
-    oled_write_P(PSTR("\n\n-C49-\n"), false);
-    uint8_t current_layer = biton32(layer_state);
+    /*oled_write_P(PSTR("\n\n-C49-\n"), false);*/
+    /*uint8_t current_layer = biton32(layer_state);*/
     /*oled_write_P(PSTR("     "), current_layer == _MAIN);*/
     /*oled_write_P(current_layer == _MAIN ? PSTR("< 0 >") : PSTR("  0  "), current_layer == _MAIN);*/
     /*oled_write_P(PSTR("     "), current_layer == _MAIN || current_layer == _ALPHA);*/
@@ -293,41 +300,41 @@ void oled_task_user(void) {
     /*oled_write_P(current_layer == _BETA ? PSTR("< B >") : PSTR("  B  "), current_layer == _BETA);*/
     /*oled_write_P(PSTR("     "), current_layer == _BETA);*/
 
-    static const char PROGMEM layers[4][26] = {
-        {
-            ' ', ' ', ' ', ' ', ' ',
-            0x80, 0x81, 0x82, 0x83, 0x84,
-            0xa0, 0xa1, 0xa2, 0xa3, 0xa4,
-            0xc0, 0xc1, 0xc2, 0xc3, 0xc4,
-            ' ', ' ', ' ', ' ', ' ', 0
-        },
-        {
-            ' ', ' ', ' ', ' ', ' ',
-            0x85, 0x86, 0x87, 0x88, 0x89,
-            0xa5, 0xa6, 0xa7, 0xa8, 0xa9,
-            0xc5, 0xc6, 0xc7, 0xc8, 0xc9,
-            ' ', ' ', ' ', ' ', ' ', 0
-        },
-        {
-            ' ', ' ', ' ', ' ', ' ',
-            0x8a, 0x8b, 0x8c, 0x8d, 0x8e,
-            0xaa, 0xab, 0xac, 0xad, 0xae,
-            0xca, 0xcb, 0xcc, 0xcd, 0xce,
-            ' ', ' ', ' ', ' ', ' ', 0
-        },
-        {
-            ' ', ' ', ' ', ' ', ' ',
-            0x8f, 0x90, 0x91, 0x92, 0x93,
-            0xaf, 0xb0, 0xb1, 0xb2, 0xb3,
-            0xcf, 0xd0, 0xd1, 0xd2, 0xd3,
-            ' ', ' ', ' ', ' ', ' ', 0
-        }
-    };
+    /*static const char PROGMEM layers[4][26] = {*/
+    /*    {*/
+    /*        ' ', ' ', ' ', ' ', ' ',*/
+    /*        0x80, 0x81, 0x82, 0x83, 0x84,*/
+    /*        0xa0, 0xa1, 0xa2, 0xa3, 0xa4,*/
+    /*        0xc0, 0xc1, 0xc2, 0xc3, 0xc4,*/
+    /*        ' ', ' ', ' ', ' ', ' ', 0*/
+    /*    },*/
+    /*    {*/
+    /*        ' ', ' ', ' ', ' ', ' ',*/
+    /*        0x85, 0x86, 0x87, 0x88, 0x89,*/
+    /*        0xa5, 0xa6, 0xa7, 0xa8, 0xa9,*/
+    /*        0xc5, 0xc6, 0xc7, 0xc8, 0xc9,*/
+    /*        ' ', ' ', ' ', ' ', ' ', 0*/
+    /*    },*/
+    /*    {*/
+    /*        ' ', ' ', ' ', ' ', ' ',*/
+    /*        0x8a, 0x8b, 0x8c, 0x8d, 0x8e,*/
+    /*        0xaa, 0xab, 0xac, 0xad, 0xae,*/
+    /*        0xca, 0xcb, 0xcc, 0xcd, 0xce,*/
+    /*        ' ', ' ', ' ', ' ', ' ', 0*/
+    /*    },*/
+    /*    {*/
+    /*        ' ', ' ', ' ', ' ', ' ',*/
+    /*        0x8f, 0x90, 0x91, 0x92, 0x93,*/
+    /*        0xaf, 0xb0, 0xb1, 0xb2, 0xb3,*/
+    /*        0xcf, 0xd0, 0xd1, 0xd2, 0xd3,*/
+    /*        ' ', ' ', ' ', ' ', ' ', 0*/
+    /*    }*/
+    /*};*/
 
-    uint8_t icon_index = current_layer == _MAIN ? 3 : current_layer == _ALPHA ? 1 : 2;
-    oled_write_P(layers[icon_index], current_layer != _MAIN);
+    /*uint8_t icon_index = current_layer == _MAIN ? 3 : current_layer == _ALPHA ? 1 : 2;*/
+    /*oled_write_P(layers[icon_index], current_layer != _MAIN);*/
 
-    oled_write_P(PSTR("\n"), false);
+    /*oled_write_P(PSTR("\n"), false);*/
 
     /*char key_data[4] = {' ', ' ', '0' + keys_pressed, 0};*/
     /*oled_write(key_data, false);*/
@@ -344,17 +351,17 @@ void oled_task_user(void) {
     /*}*/
     /*oled_write(str, false);*/
 
-    oled_write(history, false);
-    if (!history[4]) {
-        oled_write_P(PSTR("\n"), false);
-    }
+    /*oled_write(history, false);*/
+    /*if (!history[4]) {*/
+    /*    oled_write_P(PSTR("\n"), false);*/
+    /*}*/
 
-    char mod_data[6] = "\x07\x07\x07\x07\x07\0";
-    if (ctrl_pressed) mod_data[0] = 'C';
-    if (alt_pressed) mod_data[1] = 'A';
-    if (shift_pressed) mod_data[3] = 'S';
-    if (gui_pressed) mod_data[4] = 'G';
-    oled_write(mod_data, false);
+    /*char mod_data[6] = "\x07\x07\x07\x07\x07\0";*/
+    /*if (ctrl_pressed) mod_data[0] = 'C';*/
+    /*if (alt_pressed) mod_data[1] = 'A';*/
+    /*if (shift_pressed) mod_data[3] = 'S';*/
+    /*if (gui_pressed) mod_data[4] = 'G';*/
+    /*oled_write(mod_data, false);*/
 
     /*if (last_keycode) {*/
     /*    char data[6] = {0};*/
