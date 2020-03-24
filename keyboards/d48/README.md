@@ -10,7 +10,7 @@ A Proton C based handwired 48 key keyboard with 2 rotary encoders, I2C OLED & WS
 
 Make example for this keyboard (after setting up your build environment):
 
-    make gherkin:anderson:dfu-util
+    make d48:anderson:dfu-util
 
 Pinout:
 
