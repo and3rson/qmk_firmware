@@ -14,4 +14,4 @@ Make example for this keyboard (after setting up your build environment):
 
 Pinout:
 
-![D48 pinout](./media/d48_pinout.png)
+![D48 pinout](./media/d48_wiring.png)
