@@ -5,8 +5,8 @@ A Proton C based handwired 48 key keyboard with 2 rotary encoders, I2C OLED & WS
 
 ![Proton C based handwired 40% keyboard](./media/d48.jpg)
 
-Keyboard Maintainer: Andrew Dunai
-Hardware Supported: Proton C, handwired
+- Keyboard Maintainer: Andrew Dunai
+- Hardware Supported: Proton C handwired
 
 Make example for this keyboard (after setting up your build environment):
 
