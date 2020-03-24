@@ -1,6 +1,6 @@
 // Sexy LED animation.
 
-#include "d48.h"
+#include "quantum.h"
 #include "config.h"
 
 #define LED_INTERVAL 160

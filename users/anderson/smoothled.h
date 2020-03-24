@@ -1,4 +1,4 @@
-#include "d48.h"
+#include "quantum.h"
 #include "config.h"
 
 #define SMOOTH_DURATION 160

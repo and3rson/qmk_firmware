@@ -1,16 +1,10 @@
 #include "d48.h"
 #include "taphold.h"
-#include "smoothled.h"
-#include "dmc12.h"
 #include "seq.h"
+#include "layout_defs.h"
 #include <stdio.h>
-/*#include "pro_micro.h"*/
 
-#define KC______ KC_TRNS
-#define KC_DEBUG DEBUG
-#define KC_RESET RESET
-#define KC_RGB_TOG RGB_TOG
-#define KC_LIGHT_MODE LIGHT_MODE
+// Note: don't forget there's some more code in qmk_firmware/users/anderson dir
 
 #define _MAIN 0
 #define _ALPHA 1
@@ -20,9 +14,13 @@ enum custom_keycodes {
     KC_MAIN = SAFE_RANGE,
     KC_ALPHA,
     KC_BETA,
+#ifdef LIGHTMODE_ENABLE
     KC_LIGHT_MODE,
+#endif
     KC_SEQ
 };
+#ifdef LIGHTMODE_ENABLE
+#endif
 
 // TapHold is my own implementation of the `LT` macro. It's processed in `process_record_user()`.
 #define TAPHOLD_CONFIG_SIZE 3
@@ -30,8 +28,6 @@ taphold_t taphold_config[TAPHOLD_CONFIG_SIZE] = {
     {.key=KC_ALPHA, .mode=TAPHOLD_LAYER, .shortAction=KC_ESC, .longAction=_ALPHA},
     {.key=KC_BETA, .mode=TAPHOLD_LAYER, .shortAction=KC_EQL, .longAction=_BETA},
     {.key=KC_RCTRL, .mode=TAPHOLD_MOD, .shortAction=KC_MINS, .longAction=KC_LCTRL},
-    /*{.key=KC_V, .mode=TAPHOLD_MOD, .shortAction=KC_V, .longAction=KC_LALT},*/
-    /*{.key=KC_B, .mode=TAPHOLD_MOD, .shortAction=KC_B, .longAction=KC_LGUI}*/
 };
 uint16_t taphold_config_size = TAPHOLD_CONFIG_SIZE;
 uint32_t taphold_timeout = 90;
@@ -48,15 +44,9 @@ uint16_t seq_config_size = SEQ_CONFIG_SIZE;
 // Colors
 uint32_t layer_colors[3] = {
     [_MAIN] = 0xFF0010,
-    /*[_ALPHA] = 0xFF0040,*/
     [_ALPHA] = 0x4020FF,
     [_BETA] = 0x20FF00,
 };
-
-// Light modes
-enum light_mode_enum { SMOOTHLED, DMC12, LIGHT_MODE_SIZE };
-typedef enum light_mode_enum light_mode_t;
-uint8_t light_mode = SMOOTHLED;
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* Main layer
@@ -107,8 +97,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
        ┗━━━━━┻━━━━━┷━━━━━┷━━━━━┷━━━━━┷━━━━━┻━━━━━┷━━━━━┷━━━━━┷━━━━━┷━━━━━┻━━━━━┛
        */
     [_BETA] = LAYOUT_kc( \
-        RGB_TOG,1,  2,    3,   4,    5,     6,    7,    8,    9,    0,   F12,  \
-        LIGHT_MODE,F1,F2, F3,   F4,   F5,   F6,   F7,   F8,   F9,   F10,  F11,  \
+        RGB_TOG,1,  2,    3,   4,    5,     6,    7,    8,    9,    0,    F12,
+#ifdef LIGHTMODE_ENABLE
+        LIGHT_MODE,
+#else
+        _____,
+#endif
+              F1,   F2,   F3,   F4,   F5,   F6,   F7,   F8,   F9,   F10,  F11,  \
         _____,RESET,DEBUG,_____,_____,_____,SLEP, SEQ,  LCBR, RCBR, PSCR, _____,\
         _____,_____,_____,_____,_____,_____,_____,_____,_____,_____,_____,_____ \
     )
@@ -129,41 +124,14 @@ void keyboard_post_init_user(void) {
     // debug_matrix = true;
 }
 
-void set_light_mode(light_mode_t value, uint32_t color) {
-    light_mode = value;
-    if (light_mode == SMOOTHLED) {
-        smoothled_set(color);
-    } else {
-        dmc12_start(color, true);
-    }
-}
-
-void process_light_mode(void) {
-    if (light_mode == SMOOTHLED) {
-        smoothled_process();
-    } else {
-        dmc12_process();
-    }
-}
-
-void update_light_mode(uint32_t color) {
-    if (light_mode == SMOOTHLED) {
-        smoothled_set(color);
-    } else {
-        dmc12_start(color, false);
-    }
-}
-
 void eeconfig_init_user(void) {
     set_unicode_input_mode(UC_LNX);
 }
 
 void matrix_init_user(void) {
+#ifdef LIGHTMODE_ENABLE
     set_light_mode(SMOOTHLED, layer_colors[_MAIN]);
-}
-
-void matrix_scan_user(void) {
-    process_light_mode();
+#endif
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -198,10 +166,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (keycode == RESET) {
         rgblight_setrgb(255, 255, 0);
     }
-    if (record->event.pressed && keycode == LIGHT_MODE) {
-        light_mode = (light_mode + 1) % LIGHT_MODE_SIZE;
-        set_light_mode(light_mode, layer_colors[_MAIN]);
+#ifdef LIGHTMODE_ENABLE
+    if (record->event.pressed && keycode == KC_LIGHT_MODE) {
+        next_light_mode(layer_colors[_MAIN]);
     }
+#endif
     if (keycode == KC_LCTRL) {
         // Some Overlay1_Enable fuckery!
         (record->event.pressed ? register_code : unregister_code)(KC_LCTRL);
@@ -211,37 +180,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 uint32_t layer_state_set_user(uint32_t state) {
+#ifdef LIGHTMODE_ENABLE
     uint8_t layer = biton32(state);
     update_light_mode(layer_colors[layer]);
+#endif
     // smoothled_set(layer_colors[layer]);
     return state;
 }
 
 void encoder_update_user(uint8_t index, bool clockwise) {
     if (index == 0) {
-        /*if (alpha_pressed) {*/
-        /*    if (clockwise) {*/
-        /*        tap_code(KC_VOLD);*/
-        /*    } else {*/
-        /*        tap_code(KC_VOLU);*/
-        /*    }*/
-        /*} else {*/
-        /*    if (clockwise) {*/
-        /*        tap_code(KC_UP);*/
-        /*    } else {*/
-        /*        tap_code(KC_DOWN);*/
-        /*    }*/
-        /*}*/
-        if (clockwise) {
-            tap_code(KC_VOLD);
+        if (!alpha_pressed) {
+            tap_code(clockwise ? KC_VOLD : KC_VOLU);
         } else {
-            tap_code(KC_VOLU);
+            tap_code(clockwise ? KC_MPRV : KC_MNXT);
         }
     } else if (index == 1) {
-        if (clockwise) {
-            tap_code(KC_UP);
+        if (!alpha_pressed) {
+            tap_code(clockwise ? KC_UP : KC_DOWN);
         } else {
-            tap_code(KC_DOWN);
+            tap_code(clockwise ? KC_LEFT : KC_RIGHT);
         }
     }
 }
@@ -249,14 +207,7 @@ void encoder_update_user(uint8_t index, bool clockwise) {
 #ifdef OLED_DRIVER_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return OLED_ROTATION_0;
-    /*return OLED_ROTATION_270;*/
-    if (!is_keyboard_master())
-        return OLED_ROTATION_180;  // flips the display 180 degrees if offhand
-    return rotation;
 }
-
-/*static uint32_t last_fps_update = 0;*/
-/*static uint32_t last_render = 0;*/
 
 void oled_task_user(void) {
     // Host Keyboard Layer Status
@@ -288,10 +239,6 @@ void oled_task_user(void) {
     uint8_t icon_index = current_layer == _MAIN ? 3 : current_layer == _ALPHA ? 1 : 2;
     for (int i = 0; i < 3; i++) {
         oled_set_cursor(0, i + 1);
-        /*for (int k = 0; k < 5; k++) {*/
-        /*    oled_write_char(icons[icon_index][i][k], false);*/
-        /*}*/
-        /*oled_write_P(icons[icon_index][i], current_layer != _MAIN);*/
         oled_write_P(icons[icon_index][i], false);
     }
 
@@ -309,26 +256,27 @@ void oled_task_user(void) {
     oled_write_P(layers[layer_index], false);
     oled_write_P("\n", false);
 
-    char mod_data[6] = "\x07\x07\x07\x07\x07\0";
-    if (ctrl_pressed) mod_data[0] = 'C';
-    if (alt_pressed) mod_data[1] = 'A';
-    if (shift_pressed) mod_data[3] = 'S';
-    if (gui_pressed) mod_data[4] = 'G';
+    static const char PROGMEM mods[][2] = {
+        {0x94, 0x95}, // CTL
+        {0x96, 0x97}, // ALT
+        {0x98, 0x99}, // GUI
+        {0x9a, 0x9b},  // SFT
+        // {0x9c, 0x9d},  // EMPTY
+    };
+
+    char mod_data[13] = "\x9c\x9d\x9c\x9d\x9c\x9d\x9c\x9d \x07\x07\x07\0";
+    if (ctrl_pressed) strncpy(mod_data, mods[0], 2);;
+    if (alt_pressed) strncpy(mod_data + 2, mods[1], 2);;
+    if (gui_pressed) strncpy(mod_data + 4, mods[2], 2);;
+    if (shift_pressed) strncpy(mod_data + 6, mods[3], 2);;
+    uint8_t led_usb_state = host_keyboard_leds();
+    if (led_usb_state & (1 << USB_LED_NUM_LOCK)) mod_data[9] = 'N';
+    if (led_usb_state & (1 << USB_LED_CAPS_LOCK)) mod_data[10] = 'C';
+    if (led_usb_state & (1 << USB_LED_SCROLL_LOCK)) mod_data[11] = 'S';
+
     oled_set_cursor(6, 3);
     oled_write(mod_data, false);
 
-    /*uint32_t this_render = timer_read32();*/
-
-    /*if (this_render - last_fps_update > 250) {*/
-    /*    last_fps_update = this_render;*/
-    /*    char fps_buf[16];*/
-    /*    uint16_t fps = 1000 / (this_render - last_render);*/
-    /*    sprintf(fps_buf, "%d fps", fps);*/
-    /*    oled_write_ln(fps_buf, false);*/
-    /*}*/
-    /*last_render = this_render;*/
-
-    // Host Keyboard LED Status
     /*[>uint8_t led_usb_state = host_keyboard_leds();<]*/
     /*[>oled_write_P(led_usb_state & (1<<USB_LED_NUM_LOCK) ? PSTR("NUMLCK ") : PSTR("       "), false);<]*/
     /*[>oled_write_P(led_usb_state & (1<<USB_LED_CAPS_LOCK) ? PSTR("CAPLCK ") : PSTR("       "), false);<]*/
