@@ -13,7 +13,7 @@
 
 /* key matrix size */
 #define MATRIX_ROWS 8
-#define MATRIX_COLS 6
+#define MATRIX_COLS 7
 
 /* key matrix pins */
 #define MATRIX_ROW_PINS { \
@@ -21,7 +21,7 @@
 }
 
 #define MATRIX_COL_PINS { \
-    B5, B4, E6, D7, C6, D4 \
+    B5, B4, E6, D7, C6, D4, D5 \
 }
 #define UNUSED_PINS
 
@@ -76,9 +76,8 @@
 #endif
 */
 
-#define NUMBER_OF_ENCODERS 1
-#define ENCODERS_PAD_A { D0 }
-#define ENCODERS_PAD_B { D1 }
+#define ENCODERS_PAD_A { B0 }
+#define ENCODERS_PAD_B { D2 }
 #define ENCODER_RESOLUTION 4
 
 #define OLED_FONT_H "glcdfont_49.c"
