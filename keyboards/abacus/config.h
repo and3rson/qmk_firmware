@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DEVICE_VER 0x0001
 #define MANUFACTURER nickolaij
 #define PRODUCT abacus
-#define DESCRIPTION A first attempt at a custom keyboard
 
 /* key matrix size */
 #define MATRIX_ROWS 4
@@ -105,16 +104,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define NO_ACTION_ONESHOT
 
 /* disable these deprecated features by default */
-#ifndef LINK_TIME_OPTIMIZATION_ENABLE
-  #define NO_ACTION_MACRO
-  #define NO_ACTION_FUNCTION
-#endif
+#define NO_ACTION_MACRO
+#define NO_ACTION_FUNCTION
+
 /*
  * MIDI options
  */
-
-/* Prevent use of disabled MIDI features in the keymap */
-//#define MIDI_ENABLE_STRICT 1
 
 /* enable basic MIDI features:
    - MIDI notes can be sent when in Music mode is on
