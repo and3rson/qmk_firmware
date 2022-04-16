@@ -8,4 +8,3 @@
 
 void dmc12_start(uint32_t color, bool reset);
 void dmc12_process(void);
-
