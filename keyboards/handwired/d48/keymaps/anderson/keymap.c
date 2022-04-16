@@ -304,10 +304,10 @@ void oled_task_user(void) {
     };
 
     char mod_data[13] = "\x9c\x9d\x9c\x9d\x9c\x9d\x9c\x9d \x07\x07\x07\0";
-    if (ctrl_pressed) strncpy(mod_data, mods[0], 2);
-    if (alt_pressed) strncpy(mod_data + 2, mods[1], 2);
-    if (gui_pressed) strncpy(mod_data + 4, mods[2], 2);
-    if (shift_pressed) strncpy(mod_data + 6, mods[3], 2);
+    if (ctrl_pressed) memcpy(mod_data, mods[0], 2);
+    if (alt_pressed) memcpy(mod_data + 2, mods[1], 2);
+    if (gui_pressed) memcpy(mod_data + 4, mods[2], 2);
+    if (shift_pressed) memcpy(mod_data + 6, mods[3], 2);
     led_t led_usb_state = host_keyboard_led_state();
     if (led_usb_state.num_lock) mod_data[9] = 'N';
     if (led_usb_state.caps_lock) mod_data[10] = 'C';
@@ -317,7 +317,7 @@ void oled_task_user(void) {
     oled_write(mod_data, false);
 
     /* Matrix */
-    static const char PROGMEM matrix_chars[] = {
+    static const char matrix_chars[] = {
         0xb4, // None
         0xb5, // Upper
         0xb6, // Lower
