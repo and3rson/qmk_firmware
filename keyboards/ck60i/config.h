@@ -53,7 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define RGB_DI_PIN B15
 #define RGBLED_NUM 16
-#define RGBLIGT_LIMIT_VAL 200
+#define RGBLIGHT_LIMIT_VAL 200
 #define RGBLIGHT_SLEEP
 #define RGBLIGHT_ANIMATIONS
 
@@ -75,5 +75,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define NO_ACTION_LAYER
 //#define NO_ACTION_TAPPING
 //#define NO_ACTION_ONESHOT
-//#define NO_ACTION_MACRO
-//#define NO_ACTION_FUNCTION

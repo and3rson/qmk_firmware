@@ -47,6 +47,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* COL2ROW, ROW2COL */
 #define DIODE_DIRECTION ROW2COL
 
+#define LED_CAPS_LOCK_PIN B6
+#define LED_SCROLL_LOCK_PIN B7
+
 // #define BACKLIGHT_PIN B7
 // #define BACKLIGHT_LEVELS 3
 // #define BACKLIGHT_BREATHING
@@ -131,10 +134,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define NO_ACTION_LAYER
 //#define NO_ACTION_TAPPING
 //#define NO_ACTION_ONESHOT
-
-/* disable these deprecated features by default */
-#define NO_ACTION_MACRO
-#define NO_ACTION_FUNCTION
 
 /* Bootmagic Lite key configuration */
 //#define BOOTMAGIC_LITE_ROW 0

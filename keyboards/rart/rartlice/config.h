@@ -43,6 +43,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* Locking resynchronize hack */
 #define LOCKING_RESYNC_ENABLE
 
+#define LED_NUM_LOCK_PIN A8
+#define LED_CAPS_LOCK_PIN B14
+#define LED_SCROLL_LOCK_PIN A9
+#define LED_PIN_ON_STATE 0
+
 #define RGBLIGHT_ANIMATIONS
 #define RGB_DI_PIN B15
 #define RGBLED_NUM 11
@@ -63,5 +68,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define NO_ACTION_LAYER
 //#define NO_ACTION_TAPPING
 //#define NO_ACTION_ONESHOT
-//#define NO_ACTION_MACRO
-//#define NO_ACTION_FUNCTION
