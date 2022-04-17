@@ -20,7 +20,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
-//#define USE_MATRIX_I2C
+/* #define USE_MATRIX_I2C */
+
+// https://github.com/qmk/qmk_firmware/blob/master/docs/feature_split_keyboard.md#data-sync-options
+#define SPLIT_TRANSPORT_MIRROR
+#define SPLIT_LED_STATE_ENABLE
+#define SPLIT_MODS_ENABLE
 
 /* Select hand configuration */
 

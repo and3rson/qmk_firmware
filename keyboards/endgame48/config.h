@@ -36,7 +36,7 @@
 //#endif
 
 /* Set 0 if debouncing isn't needed */
-#define DEBOUNCING_DELAY 5
+#define DEBOUNCE 20
 
 /* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
 #define LOCKING_SUPPORT_ENABLE
@@ -81,5 +81,9 @@
 #define ENCODER_RESOLUTION 4
 
 #define OLED_FONT_H "glcdfont_49.c"
+
+#define TAPPING_TERM 90
+#define PERMISSIVE_HOLD
+#define TAPPING_FORCE_HOLD
 
 #endif

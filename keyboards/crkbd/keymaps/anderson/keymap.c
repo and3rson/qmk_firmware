@@ -59,9 +59,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
        */
     [_MAIN] = LAYOUT_split_3x6_3( \
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC, \
-        KC_ALPHA,KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_ENT,  \
-        KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RCTRL,\
-                                   KC_LALT, KC_LGUI, KC_SPC,  KC_SPC,  KC_BETA, KC_QUOT \
+        LT(ALPHA, KC_ESC),KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_ENT,  \
+        KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, MT(KC_RCTRL, KC_MINS),\
+                                   KC_LALT, KC_LGUI, KC_SPC,  KC_SPC,  LT(BETA, KC_EQL), KC_QUOT \
     ),
 
     /* Alpha layer (𝛼)
@@ -103,9 +103,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
-#ifdef OLED_DRIVER_ENABLE
+#ifdef OLED_ENABLE
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
-    return is_master ? OLED_ROTATION_270 : OLED_ROTATION_180;
+    return is_keyboard_master() ? OLED_ROTATION_270 : OLED_ROTATION_180;
 }
 
 #define L_BASE 0
@@ -187,8 +187,8 @@ void oled_render_logo(void) {
     oled_write_P(crkbd_logo, false);
 }
 
-void oled_task_user(void) {
-    if (is_master) {
+bool oled_task_user(void) {
+    if (is_keyboard_master()) {
         /* Host Keyboard Layer Status */
         uint8_t current_layer = get_highest_layer(layer_state);
 
@@ -216,7 +216,7 @@ void oled_task_user(void) {
             }
         };
         uint8_t icon_index = current_layer == _MAIN ? 3 : current_layer == _ALPHA ? 1 : 2;
-        oled_write_ln_P(PSTR("Layer"), false);
+        oled_write_ln_P(PSTR("CRKBD"), false);
         for (int i = 0; i < 3; i++) {
             oled_set_cursor(0, i + 4);
             oled_write_P(icons[icon_index][i], false);
@@ -275,7 +275,9 @@ void oled_task_user(void) {
             }
         }
     }
+    return false;
 }
+#endif // OLED_ENABLE
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.pressed) {
@@ -291,7 +293,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         gui_pressed = record->event.pressed;
     }
 
-    return taphold_process(keycode, record);
+    return true;
+    /* return taphold_process(keycode, record); */
     // return true;
 }
-#endif // OLED_DRIVER_ENABLE

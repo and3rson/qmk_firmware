@@ -46,7 +46,7 @@ BOOTLOADER = caterina
 #   comment out to disable the options.
 #
 BOOTMAGIC_ENABLE = no	# Virtual DIP switch configuration(+1000)
-MOUSEKEY_ENABLE = no	# Mouse keys(+4700)
+MOUSEKEY_ENABLE = yes	# Mouse keys(+4700)
 EXTRAKEY_ENABLE = yes	# Audio control and System control(+450)
 CONSOLE_ENABLE = no	# Console for debug(+400)
 COMMAND_ENABLE = no    # Commands for debug and configuration
@@ -56,4 +56,7 @@ BACKLIGHT_ENABLE = no  # Enable keyboard backlight functionality
 AUDIO_ENABLE = no
 RGBLIGHT_ENABLE = yes
 ENCODER_ENABLE = yes
-OLED_DRIVER_ENABLE = yes
+OLED_ENABLE = yes
+RAW_ENABLE = yes
+
+DEBOUNCE_TYPE = sym_eager_pk
