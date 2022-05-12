@@ -8,7 +8,7 @@
 #define PRODUCT_ID      0x6060
 #define DEVICE_VER      0x0001
 #define MANUFACTURER    Andrew Dunai
-#define PRODUCT         Endgame 48
+#define PRODUCT         Endgame 48 (v2)
 #define DESCRIPTION     A 12x4 split ortholinear keyboard with encoder
 
 /* key matrix size */
@@ -17,11 +17,13 @@
 
 /* key matrix pins */
 #define MATRIX_ROW_PINS { \
-    B6, B2, B3, B1, F7, F6, F5, F4 \
+    D4, B5, D5, B7, \
+    F4, B6, F1, F0 \
 }
 
 #define MATRIX_COL_PINS { \
-    B5, B4, E6, D7, C6, D4, D5 \
+    F5, F6, F7, B1, B3, B2, \
+    D7 \
 }
 #define UNUSED_PINS
 
@@ -54,10 +56,13 @@
 
 #define RGB_DI_PIN D3
 #ifdef RGB_DI_PIN
-#define RGBLED_NUM 14
+#define RGBLED_NUM 12
 #define RGBLIGHT_HUE_STEP 8
 #define RGBLIGHT_SAT_STEP 8
 #define RGBLIGHT_VAL_STEP 8
+/* #define RGBLIGHT_SLEEP */
+
+#define RGBLIGHT_DEFAULT_VAL 0
 #endif
 
 // #undef RGBLIGHT_ANIMATIONS
@@ -76,14 +81,20 @@
 #endif
 */
 
-#define ENCODERS_PAD_A { B0 }
-#define ENCODERS_PAD_B { D2 }
+#define ENCODERS_PAD_A { B4 }
+#define ENCODERS_PAD_B { E6 }
 #define ENCODER_RESOLUTION 4
-
-#define OLED_FONT_H "glcdfont_49.c"
 
 #define TAPPING_TERM 90
 #define PERMISSIVE_HOLD
 #define TAPPING_FORCE_HOLD
+
+// Reduce firmware size by only using uprintf
+
+// Compat with -flto
+#define NO_ACTION_MACRO
+#define NO_ACTION_FUNCTION
+
+#define NO_ACTION_ONESHOT
 
 #endif
