@@ -81,8 +81,8 @@
 #endif
 */
 
-#define ENCODERS_PAD_A { B4 }
-#define ENCODERS_PAD_B { E6 }
+#define ENCODERS_PAD_A { E6 }
+#define ENCODERS_PAD_B { B4 }
 #define ENCODER_RESOLUTION 4
 
 #define TAPPING_TERM 90
@@ -96,5 +96,7 @@
 #define NO_ACTION_FUNCTION
 
 #define NO_ACTION_ONESHOT
+
+#define OLED_FONT_H "glcdfont_48_v2.c"
 
 #endif

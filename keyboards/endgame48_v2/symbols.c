@@ -1,6 +1,14 @@
 #include "symbols.h"
 
-const char PROGMEM layers[5][26] = {
+const char PROGMEM logo[12] = {
+    0x8f, 0x90, 0x91, 0x92, 0x93,
+    0xaf, 0xb0, 0xb1, 0xb2, 0xb3,
+    /* '4', '8', ' ', 'v', '2', */
+    '\n',
+    0
+};
+
+const char PROGMEM layerIcons[4][26] = {
     {
         ' ', ' ', ' ', ' ', ' ',
         0x20, 0x80, 0x81, 0x82, 0x20,
@@ -29,21 +37,14 @@ const char PROGMEM layers[5][26] = {
         0x20, 0xc9, 0xca, 0xcb, 0x20,
         ' ', ' ', ' ', ' ', ' ', 0
     },
-    {
-        ' ', ' ', ' ', ' ', ' ',
-        ' ', 0x8c, 0x8d, 0x8e, ' ',
-        ' ', 0xac, 0xad, 0xae, ' ',
-        ' ', 0xcc, 0xcd, 0xce, ' ',
-        ' ', ' ', ' ', ' ', ' ', 0
-    }
 };
 
-const char PROGMEM logo[12] = {
-    0x8f, 0x90, 0x91, 0x92, 0x93,
-    0xaf, 0xb0, 0xb1, 0xb2, 0xb3,
-    /* '4', '8', ' ', 'v', '2', */
-    '\n',
-    0
+const char PROGMEM resetIcon[26] = {
+    ' ', ' ', ' ', ' ', ' ',
+    ' ', 0x8c, 0x8d, 0x8e, ' ',
+    ' ', 0xac, 0xad, 0xae, ' ',
+    ' ', 0xcc, 0xcd, 0xce, ' ',
+    ' ', ' ', ' ', ' ', ' ', 0
 };
 
 const char PROGMEM mods[4][3] = {

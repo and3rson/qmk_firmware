@@ -44,6 +44,10 @@ void smoothled_process(void) {
     if (smoothledTimer == -1) {
         return;
     }
+    smoothled_render();
+}
+
+void smoothled_render(void) {
     uint32_t passed = timer_elapsed32(smoothledTimer);
     /* uint32_t ta = duration - tb; */
     if (passed > duration) {

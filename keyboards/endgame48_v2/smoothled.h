@@ -11,3 +11,4 @@ typedef struct {
 
 void smoothled_set(uint32_t color, uint32_t newDuration);
 void smoothled_process(void);
+void smoothled_render(void);

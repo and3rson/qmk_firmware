@@ -64,7 +64,7 @@ RAW_ENABLE = yes
 
 DEBOUNCE_TYPE = sym_eager_pk
 
-SRC += taphold.c smoothled.c
+SRC += taphold.c smoothled.c symbols.c
 
 # https://thomasbaart.nl/2018/12/01/reducing-firmware-size-in-qmk/
 EXTRAFLAGS += -flto

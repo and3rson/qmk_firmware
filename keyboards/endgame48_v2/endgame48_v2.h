@@ -3,7 +3,14 @@
 
 #include "quantum.h"
 
+#define DEBUG_COLOR 0xFFFF00
+
 #define NOPE KC_NO
+
+enum eg_custom_keycodes {
+    KC_EGMENU = SAFE_RANGE,
+    EG_SAFE_RANGE,
+};
 
 #define LAYOUT( \
     K00, K01, K02, K03, K04, K05,      K40, K41, K42, K43, K44, K45, \
@@ -20,4 +27,7 @@
     {K60, K61, K62, K63, K64, K65, NOPE}, \
     {K70, K71, K72, K73, K74, K75, K76} \
 }
+
+void request_reset(void);
+
 #endif
