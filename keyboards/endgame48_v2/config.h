@@ -134,11 +134,13 @@
 
 // Trackpoint
 
+#define PS2_MOUSE_INIT_DELAY 200
+
 #ifdef PS2_USE_USART
 #define PS2_CLOCK_PIN   D5
 #define PS2_DATA_PIN    D2
 
-#define PS2_MOUSE_USE_REMOTE_MODE
+/* #define PS2_MOUSE_USE_REMOTE_MODE */
 
 /* synchronous, odd parity, 1-bit stop, 8-bit data, sample at falling edge */
 /* set DDR of CLOCK as input to be slave */
@@ -173,6 +175,7 @@
 #endif
 
 #ifdef PS2_USE_INT
+// Note: pins are swapped, so re-soldering is needed to test both modes
 #define PS2_CLOCK_PIN   D2
 #define PS2_DATA_PIN    D5
 

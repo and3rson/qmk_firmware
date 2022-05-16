@@ -20,7 +20,7 @@ void smoothled_set(uint32_t color, uint32_t newDuration) {
 }
 
 color_t interp(color_t a, color_t b, float k, uint8_t x) {
-    // k = pow(k, 3);
+    k = pow(k, 2);
     // Center
     x = fabs(5.5 - ((float)x));
     // Time range for current LED

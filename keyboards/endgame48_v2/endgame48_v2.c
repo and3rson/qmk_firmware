@@ -61,61 +61,127 @@ void mute(void) {
     tap_code(KC_MUTE);
 }
 
-typedef struct {
-    const char *title;
+typedef struct menu_item_t {
+    char title[6];
     void (*func)(void);
+    struct menu_t *submenu;
 } menu_item_t;
 
+typedef struct menu_t {
+    char   *title;
+    uint8_t count;
+    uint8_t current;
+    uint8_t scroll;
+    void (*opened)(struct menu_t *);
+    menu_item_t *items;
+} menu_t;
+
 static uint32_t last_render = 0;
-static bool is_menu = false;
-static uint8_t menu_selected = 0;
-static menu_item_t menu[] = {
-    {
-        .title="Mute",
-        .func=mute,
-    },
-    {
-        .title="RGB",
-        .func=toggle_rgb,
-    },
-    {
-        .title="Reset",
-        .func=request_reset,
-    },
-    {
-        .title="DelEE",
-        .func=eeconfig_init,
-    },
+/* static bool     is_menu     = false; */
+/* static uint32_t menu_path   = 0; */
+/* static uint32_t menu_level  = 0; */
+
+static int8_t  depth = -1;
+static menu_t *menus[8];
+
+#define IN_MENU depth != -1
+#define CURRENT_MENU menus[depth]
+#define MAX_ITEMS 10
+
+void init_eeprom_menu(menu_t *this) {
+    for (int i = 0; i < this->count; i++) {
+        uint8_t b = eeprom_read_byte((uint8_t *)i);
+        sprintf(this->items[i].title, "%02X:%02X", i, b);
+    }
+}
+static menu_t list_eeprom_menu = {
+    .title  = "EEPRM",
+    .count  = 64,
+    .items  = (menu_item_t[64]){},
+    .opened = init_eeprom_menu,
 };
-static uint8_t menu_size = sizeof(menu) / sizeof(menu_item_t);
+static menu_t main_menu = {
+    .title = "CFG",
+    .count = 5,
+    .items =
+        (menu_item_t[]){
+            {
+                .title = "Mute",
+                .func  = mute,
+            },
+            {
+                .title = "RGB",
+                .func  = toggle_rgb,
+            },
+            {
+                .title = "Reset",
+                .func  = request_reset,
+            },
+            {
+                .title   = "LsEE",
+                .submenu = &list_eeprom_menu,
+            },
+            {
+                .title = "DelEE",
+                .func  = eeconfig_init,
+            },
+        },
+};
+/* static menu_t *menu = NULL; */
+/* static menu_item_t menu[] = { */
+/* }; */
+/* static uint8_t menu_size = sizeof(menu) / sizeof(menu_item_t); */
 
 bool process_record_kb(uint16_t keycode, keyrecord_t *record) {
-    if (is_menu) {
+    if (IN_MENU) {
+        // Menu is open
         if (record->event.pressed) {
             if (keycode == KC_EGMENU) {
-                menu[menu_selected].func();
-                is_menu = false;
+                menu_t     *menu = CURRENT_MENU;
+                menu_item_t item = menu->items[menu->current];
+                if (item.submenu != NULL) {
+                    item.submenu->current = 0;
+                    item.submenu->scroll  = 0;
+                    menus[++depth]        = item.submenu;
+                    item.submenu->opened(item.submenu);
+                } else if (item.func != NULL) {
+                    item.func();
+                    depth = -1;
+                }
             } else {
-                is_menu = false;
+                depth--;
             }
         }
         return false;
-    }
-
-    if (keycode == KC_EGMENU && record->event.pressed) {
-        is_menu = !is_menu;
-        menu_selected = 0;
+    } else if (keycode == KC_EGMENU) {
+        // Menu is not open, KCEGMENU pressed
+        if (record->event.pressed) {
+            main_menu.current = 0;
+            main_menu.scroll  = 0;
+            menus[++depth]    = &main_menu;
+        }
         return false;
     }
     return process_record_user(keycode, record);
 }
 
 bool encoder_update_kb(uint8_t index, bool clockwise) {
-    if (is_menu) {
+    if (IN_MENU) {
+        menu_t *menu = CURRENT_MENU;
         if (clockwise) {
-            menu_selected = (menu_selected + 1) % menu_size;
+            if (menu->current < menu->count - 1) {
+                menu->current++;
+            }
+            if (menu->current - menu->scroll >= MAX_ITEMS) {
+                menu->scroll++;
+            }
         } else {
-            menu_selected = menu_selected ? menu_selected - 1 : menu_size - 1;
+            if (menu->current) {
+                menu->current--;
+            }
+            if (menu->current < menu->scroll) {
+                menu->scroll--;
+            }
         }
     } else {
         encoder_update_user(index, clockwise);
@@ -131,20 +197,23 @@ bool oled_task_kb(void) {
             oled_write_P(logo, false);
             oled_write_P(resetIcon, false);
             oled_write("\nREADY\n FOR \nFLASH", false);
-        } else if (is_menu) {
+        } else if (IN_MENU) {
             oled_clear();
             oled_write_P(logo, false);
-            oled_write(" CFG \n", false);
+            menu_t *menu     = CURRENT_MENU;
+            char    title[7] = "     \0\0";
+            sprintf(title, "%-5s", menu->title);
+            title[5] = '\n';
+            oled_write(title, false);
             /* uint8_t b = eeprom_read_byte((uint8_t*)EECONFIG_SIZE); */
             /* eeprom_update_byte((uint8_t*)EECONFIG_SIZE, ++b); */
             /* char dbg[6]; */
             /* sprintf(dbg, "B: %d\n", b); */
             /* oled_write(dbg, false); */
-            for (uint8_t i = 0; i < menu_size; i++) {
+            for (uint8_t i = menu->scroll; i < (menu->count >= MAX_ITEMS ? menu->scroll + MAX_ITEMS : menu->count); i++) {
                 char buf[6] = "     \0";
-                uint8_t len = strlen(menu[i].title);
-                memcpy(buf, menu[i].title, len > 5 ? 5 : len);
-                oled_write(buf, menu_selected == i);
+                sprintf(buf, "%-5s", menu->items[i].title);
+                oled_write(buf, menu->current == i);
             }
         } else {
             oled_task_user();
@@ -155,7 +224,7 @@ bool oled_task_kb(void) {
 
 void raw_hid_receive(uint8_t *data, uint8_t length) {
     /* if (length >= 4 && data[0] == 0x07 && data[1] == 0x83) { */
-        /* rgblight_sethsv(data[2], data[3], 255); */
+    /* rgblight_sethsv(data[2], data[3], 255); */
     /* } */
     /* if (length >= 3) { */
     /* sprintf(debug_line, "%d", length); */
