@@ -59,8 +59,12 @@ AUDIO_ENABLE = no
 RGBLIGHT_ENABLE = yes
 ENCODER_ENABLE = yes
 OLED_ENABLE = yes
-RAW_ENABLE = yes
+# RAW_ENABLE = yes
 # VIA_ENABLE = yes
+
+PS2_MOUSE_ENABLE = yes
+# PS2_USE_USART = yes
+PS2_USE_INT = yes
 
 DEBOUNCE_TYPE = sym_eager_pk
 

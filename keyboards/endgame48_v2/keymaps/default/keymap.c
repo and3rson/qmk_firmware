@@ -198,8 +198,6 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
     return false;
 }
 
-static bool blink = false;
-
 bool oled_task_user(void) {
     /* oled_write_P(PSTR("\n\nEG 48\n\n"), false); */
     oled_write_P(logo, false);
@@ -210,7 +208,7 @@ bool oled_task_user(void) {
     /*     oled_invert(true); */
     /*     oled_write_P(layers[4], false); */
     /* } else { */
-    oled_write_P(layerIcons[current_layer], current_layer != _MAIN && (blink = !blink)); // && is_inverted);
+    oled_write_P(layerIcons[current_layer], current_layer != _MAIN); // && is_inverted);
     /* } */
 
     oled_write_P(PSTR("\n\n"), false);

@@ -124,7 +124,7 @@ bool encoder_update_kb(uint8_t index, bool clockwise) {
 }
 
 bool oled_task_kb(void) {
-    if (timer_elapsed32(last_render) > 50) {
+    if (timer_elapsed32(last_render) > 100) {
         last_render = timer_read32();
         if (reset_requested) {
             oled_clear();
