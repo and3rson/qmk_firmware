@@ -11,7 +11,7 @@
 	url = https://github.com/qmk/googletest
 [submodule "lib/lufa"]
 	path = lib/lufa
-	url = https://github.com/qmk/lufa
+	url = git@github.com:qmk/lufa.git
 [submodule "lib/vusb"]
 	path = lib/vusb
 	url = https://github.com/qmk/v-usb
